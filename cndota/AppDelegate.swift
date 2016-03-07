@@ -27,6 +27,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var pmTimeHour: NSTextField!
     @IBOutlet weak var pmTimeMimute: NSTextField!
     
+    
+    @IBOutlet weak var userCode:NSTextField!
+    @IBOutlet weak var userpwd:NSTextField!
+    
+    
     var state:Bool=false
     
     
@@ -45,7 +50,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         button1.title = "自动打卡"
         
         button2.title = "中断打卡"
-    
         
     }
     
@@ -60,11 +64,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @IBAction func start(sender:AnyObject){
         let timePrefix = getTimePrefix()
-        let timeSuffix = "\(amTimeHour.stringValue):\(amTimeMimute.stringValue):00"
-
-        let settedTime = "\(timePrefix)\(timeSuffix)"
+        let amTimeSuffix = "\(amTimeHour.stringValue):\(amTimeMimute.stringValue):00"
         
-        let intervalTime = getTimeInterval(settedTime)
+        let pmTimeSuffix = "\(pmTimeHour.stringValue):\(pmTimeMimute.stringValue):00"
+
+        let amSettedTime = "\(timePrefix)\(amTimeSuffix)"
+        let pmSettedTime = "\(timePrefix)\(pmTimeSuffix)"
+        
+        let amIntervalTime = getTimeInterval(amSettedTime)
+        let pmIntervalTime = getTimeInterval(pmSettedTime)
         
         showNotification("少女祈祷中~")
         if showAlert(){
@@ -72,14 +80,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             showNotification("施法成功 :-D")
             state = true
             
-            
-            amDispatch(intervalTime){
+            timeDispatch(amIntervalTime){
                 
-//                self.executeCommand("/usr/local/bin/python3", args: ["/Users/RadAsm/pythonProjects/auto_login/daka/main.py"])
+                self.executeCommand("/usr/local/bin/python3", args: ["/Users/RadAsm/pythonProjects/auto_login/daka/main.py", "\(self.userCode.stringValue)","\(self.userpwd.stringValue)"])
                 print("this is fucking awesome!")
                 
             }
             
+            timeDispatch(pmIntervalTime){
+                
+                self.executeCommand("/usr/local/bin/python3", args: ["/Users/RadAsm/pythonProjects/auto_login/daka/main.py", "\(self.userCode.stringValue)","\(self.userpwd.stringValue)"])
+                print("this is fucking awesome!")
+                
+            }
             
             
         }else{
@@ -151,8 +164,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let alertView:NSAlert = NSAlert()
         alertView.addButtonWithTitle("OK")
         alertView.addButtonWithTitle("Cancle")
-        alertView.messageText = "hehehehehe"
-        alertView.informativeText = "fantianwen is fucking awesome!"
+        alertView.messageText = "开始魔法吟唱~"
+        alertView.informativeText = "￥##￥%……&*（&……%￥%……"
         let res = alertView.runModal()
         if res == NSAlertFirstButtonReturn{
             return true
@@ -166,8 +179,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let alertView:NSAlert = NSAlert()
         alertView.addButtonWithTitle("OK")
         alertView.addButtonWithTitle("Cancle")
-        alertView.messageText = "中断提醒"
-        alertView.informativeText = "确定要停止提醒么？"
+        alertView.messageText = "中断施法？"
+        alertView.informativeText = "确定要停止施法么？"
         let res = alertView.runModal()
         if res == NSAlertFirstButtonReturn{
             return true
@@ -176,8 +189,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     
-    func amDispatch(delay:Double,closure:()->()){
-        
+    func timeDispatch(delay:Double,closure:()->()){
+
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), closure)
         
         
